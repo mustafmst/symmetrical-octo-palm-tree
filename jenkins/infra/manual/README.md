@@ -12,7 +12,9 @@
 
 
 ### Materials and documentations
-* TODO
+* https://ubuntu.com/tutorials/install-and-configure-nginx#2-installing-nginx
+* https://www.jenkins.io/doc/book/installing/linux/#debianubuntu
+* 
 
 ### Manual steps to reproduce
 * TODO
