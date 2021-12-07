@@ -8,6 +8,7 @@ terraform apply
 
 terraform output -raw tls_private_key > ~/.ssh/id_rsa_terraform_vm
 chmod 600 ~/.ssh/id_rsa_terraform_vm
+ssh-add ~/.ssh/id_rsa_terraform_vm
 
 cat <<EOF >> ~/.ssh/config
 

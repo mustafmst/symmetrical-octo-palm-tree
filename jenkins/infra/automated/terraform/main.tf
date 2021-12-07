@@ -76,6 +76,7 @@ resource "azurerm_public_ip" "pubip" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
+  domain_name_label   = "mst-terraform-jenkins"
 }
 
 # create network security group with ssh, http and https rules
@@ -191,4 +192,8 @@ output "vm_ip" {
 
 output "vm_user" {
   value = azurerm_linux_virtual_machine.vm.admin_username
+}
+
+output "vm_fqdn" {
+  value = azurerm_public_ip.pubip.fqdn
 }

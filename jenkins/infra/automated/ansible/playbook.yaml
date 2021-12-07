@@ -1,0 +1,38 @@
+---
+- name: setup nginx and jenkins
+  hosts: all
+  become: true
+  tasks:
+    - name: Update the repository cache and update package "nginx" to latest version using default release squeeze-backport
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+    - name: install java
+      apt:
+        name: openjdk-11-jdk
+        state: present
+        update_cache: yes
+    - name: install jenkins
+    - name: unlink default nginx page
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+    - name: copy jenkins.conf
+      ansible.builtin.copy:
+        src: jenkins.conf
+        dest: /etc/nginx/sites-available/jenkins.conf
+        force: no
+    - name: Create a symbolic link
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/jenkins.conf
+        dest: /etc/nginx/sites-enabled/jenkins.conf
+        state: link
+    # - name: Add specified repository into sources list
+    #   ansible.builtin.apt_repository:
+    #     repo: deb https://pkg.jenkins.io/debian-stable jenkins stable
+    #     state: present
+    #   apt:
+    #     name: jenkins
+    #     state: present
+    #     update_cache: yes
