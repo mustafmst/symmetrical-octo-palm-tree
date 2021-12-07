@@ -3,35 +3,54 @@
   hosts: all
   become: true
   tasks:
-    - name: Update the repository cache and update package "nginx" to latest version using default release squeeze-backport
-      apt:
-        name: nginx
+    - name: ensure the jenkins apt repository key is installed
+      apt_key: 
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io.key 
         state: present
-        update_cache: yes
-    - name: install java
+    - name: ensure repo is configured
+      apt_repository:
+        repo: deb https://pkg.jenkins.io/debian binary/
+        state: present
+    - name: Update repo and install nginx, java and jenkins
       apt:
-        name: openjdk-11-jdk
+        pkg: 
+        - nginx 
+        - openjdk-11-jdk 
+        - jenkins
+        - python3-certbot-nginx
         state: present
         update_cache: yes
     - name: unlink default nginx page
-      ansible.builtin.file:
+      file:
         path: /etc/nginx/sites-enabled/default
         state: absent
     - name: copy jenkins.conf
-      ansible.builtin.copy:
+      copy:
         src: jenkins.conf
         dest: /etc/nginx/sites-available/jenkins.conf
         force: no
     - name: Create a symbolic link
-      ansible.builtin.file:
+      file:
         src: /etc/nginx/sites-available/jenkins.conf
         dest: /etc/nginx/sites-enabled/jenkins.conf
         state: link
-    # - name: Add specified repository into sources list
-    #   ansible.builtin.apt_repository:
-    #     repo: deb https://pkg.jenkins.io/debian-stable jenkins stable
-    #     state: present
-    #   apt:
-    #     name: jenkins
-    #     state: present
-    #     update_cache: yes
+    - name: ensure jenkins is running
+      service:
+        name: jenkins
+        state: started
+    - name: restart nginx
+      service: 
+        name: nginx
+        state: restarted
+    - name: cat file
+      shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+      register: cat_content_file
+    - name: echo file
+      debug:
+        msg: "{{ cat_content_file.stdout }}"
+    - name: certbot
+      shell: certbot --nginx --email pawel.mstowski@gmail.com --agree-tos --domains mst-terraform-jenkins.germanywestcentral.cloudapp.azure.com -n
+    - name: restart nginx
+      service: 
+        name: nginx
+        state: restarted
