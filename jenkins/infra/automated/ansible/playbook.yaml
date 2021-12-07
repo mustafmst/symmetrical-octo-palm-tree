@@ -13,7 +13,6 @@
         name: openjdk-11-jdk
         state: present
         update_cache: yes
-    - name: install jenkins
     - name: unlink default nginx page
       ansible.builtin.file:
         path: /etc/nginx/sites-enabled/default
