@@ -3,15 +3,22 @@
   hosts: all
   become: true
   tasks:
-    - name: ensure the jenkins apt repository key is installed
+    
+    - name: Ensure the jenkins apt repository key is installed
       apt_key: 
         url: https://pkg.jenkins.io/debian-stable/jenkins.io.key 
         state: present
-    - name: ensure repo is configured
+
+    - name: Ensure repo is configured
       apt_repository:
         repo: deb https://pkg.jenkins.io/debian binary/
         state: present
-    - name: Update repo and install nginx, java and jenkins
+
+    - name: Update apt repos
+      apt:
+        update_cache: yes
+
+    - name: Install nginx, java and jenkins
       apt:
         pkg: 
         - nginx 
@@ -19,38 +26,46 @@
         - jenkins
         - python3-certbot-nginx
         state: present
-        update_cache: yes
-    - name: unlink default nginx page
+
+    - name: Unlink default nginx page
       file:
         path: /etc/nginx/sites-enabled/default
         state: absent
-    - name: copy jenkins.conf
+
+    - name: Copy jenkins.conf
       copy:
         src: jenkins.conf
         dest: /etc/nginx/sites-available/jenkins.conf
         force: no
+
     - name: Create a symbolic link
       file:
         src: /etc/nginx/sites-available/jenkins.conf
         dest: /etc/nginx/sites-enabled/jenkins.conf
         state: link
-    - name: ensure jenkins is running
+
+    - name: Ensure jenkins is running
       service:
         name: jenkins
         state: started
-    - name: restart nginx
+
+    - name: Restart nginx
       service: 
         name: nginx
         state: restarted
-    - name: cat file
+
+    - name: Cat file
       shell: cat /var/lib/jenkins/secrets/initialAdminPassword
       register: cat_content_file
-    - name: echo file
+      
+    - name: Echo file
       debug:
         msg: "{{ cat_content_file.stdout }}"
-    - name: certbot
+        
+    - name: Certbot
       shell: certbot --nginx --email pawel.mstowski@gmail.com --agree-tos --domains mst-terraform-jenkins.germanywestcentral.cloudapp.azure.com -n
-    - name: restart nginx
+
+    - name: Restart nginx
       service: 
         name: nginx
         state: restarted
