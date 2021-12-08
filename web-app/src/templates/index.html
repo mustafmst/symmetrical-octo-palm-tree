@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h1>Flask app</h1>
+    {% if username %}
+    <h1>Welcome {{username}}</h1>
+    {% endif %}
+{% endblock %}

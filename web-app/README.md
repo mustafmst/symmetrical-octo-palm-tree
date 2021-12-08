@@ -16,3 +16,9 @@ Here you will implement Continuous Integration and Continuous Delivery (or even 
   * Try different deployment strategies
 * Question:
   * Two layer application? (frontend → backend → database)?
+
+
+## Used libs
+
+App -> Flask
+CSS -> picocss
