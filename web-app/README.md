@@ -22,3 +22,4 @@ Here you will implement Continuous Integration and Continuous Delivery (or even 
 
 App -> Flask
 CSS -> picocss
+ORM -> peewee
