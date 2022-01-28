@@ -6,4 +6,4 @@ def hash_password(password):
 
 
 def check_password(password, hash):
-    bcrypt.checkpw(password, hash)
+    return bcrypt.checkpw(password, hash)

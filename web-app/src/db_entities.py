@@ -1,5 +1,4 @@
 from peewee import *
-import datetime
 
 from src.utils import hash_password
 
@@ -17,5 +16,5 @@ class User(BaseModel):
 
     @classmethod
     def create(cls, **query):
-        query["password_hash"] = hash_password(query["password_hash"])
+        query["password_hash"] = hash_password(query["password"])
         return super(User, cls).create(**query)
