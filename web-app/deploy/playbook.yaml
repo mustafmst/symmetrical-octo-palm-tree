@@ -1,0 +1,71 @@
+---
+- name: setup nginx and jenkins
+  hosts: all
+  become: true
+  tasks:
+    
+    - name: Ensure the jenkins apt repository key is installed
+      apt_key: 
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io.key 
+        state: present
+
+    - name: Ensure repo is configured
+      apt_repository:
+        repo: deb https://pkg.jenkins.io/debian binary/
+        state: present
+
+    - name: Update apt repos
+      apt:
+        update_cache: yes
+
+    - name: Install nginx, java and jenkins
+      apt:
+        pkg: 
+        - nginx 
+        - openjdk-11-jdk 
+        - jenkins
+        - python3-certbot-nginx
+        state: present
+
+    - name: Unlink default nginx page
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+
+    - name: Copy jenkins.conf
+      copy:
+        src: jenkins.conf
+        dest: /etc/nginx/sites-available/jenkins.conf
+        force: no
+
+    - name: Create a symbolic link
+      file:
+        src: /etc/nginx/sites-available/jenkins.conf
+        dest: /etc/nginx/sites-enabled/jenkins.conf
+        state: link
+
+    - name: Ensure jenkins is running
+      service:
+        name: jenkins
+        state: started
+
+    - name: Restart nginx
+      service: 
+        name: nginx
+        state: restarted
+
+    - name: Cat file
+      shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+      register: cat_content_file
+      
+    - name: Echo file
+      debug:
+        msg: "{{ cat_content_file.stdout }}"
+        
+    - name: Certbot
+      shell: certbot --nginx --email pawel.mstowski@gmail.com --agree-tos --domains mst-terraform-jenkins.germanywestcentral.cloudapp.azure.com -n
+
+    - name: Restart nginx
+      service: 
+        name: nginx
+        state: restarted
