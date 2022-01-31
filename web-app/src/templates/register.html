@@ -1,9 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
     <h1>Register</h1>
-    {% if warning %}
-        <article>{{ warning }}</article>
-    {% endif %}
+    {% include 'error_message.html' %}
     <div class="grid">
         <div></div>
         <div>
