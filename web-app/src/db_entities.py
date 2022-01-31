@@ -1,6 +1,6 @@
 from peewee import *
 
-from src.utils import hash_password
+from utils import hash_password
 
 db = SqliteDatabase('test.db')
 
@@ -17,4 +17,5 @@ class User(BaseModel):
     @classmethod
     def create(cls, **query):
         query["password_hash"] = hash_password(query["password"])
+        query.pop("password")
         return super(User, cls).create(**query)

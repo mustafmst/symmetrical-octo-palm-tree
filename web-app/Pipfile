@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 peewee = "*"
 bcrypt = "*"
+flask = "*"
 
 [dev-packages]
 

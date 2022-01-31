@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
     <h1>Login</h1>
+    {% if warning %}
+        <article>{{ warning }}</article>
+    {% endif %}
     <div class="grid">
         <div></div>
         <div>

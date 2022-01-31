@@ -1,12 +1,15 @@
 import os
 from flask import Flask, render_template, session, request, redirect, url_for
 
-from src.db_entities import User
-from src.utils import check_password
+from db_entities import User, db
+from utils import check_password
 
 app = Flask(__name__)
 
 app.secret_key = os.environ.get('SECRET_KEY', 'gtth5thbdh534yht5rhy5yh%#$ha24')
+
+db.connect()
+db.create_tables([User])
 
 
 @app.route("/", methods=['GET'])
@@ -17,13 +20,16 @@ def index():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    warning = None
     if request.method == 'POST':
-        user = User.get(User.username == request.form['username'])
-        if check_password(request.form['password'], user.password_hash):
+        user = User.select().where(User.username == request.form['username']).get_or_none()
+        if user and check_password(request.form['password'], user.password_hash):
             session['username'] = user.username
+        else:
+            warning = f"User not exists or wrong password."
     if 'username' in session:
         return redirect(url_for('index'))
-    return render_template('login.html')
+    return render_template('login.html', warning=warning)
 
 
 @app.route("/logout", methods=['GET'])
@@ -34,11 +40,20 @@ def logout():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+    warning = None
     if request.method == 'POST':
-        user = User.create(username=request.form['username'], password=request.form['password'])
-        user.save()
-        return redirect(url_for('index'))
-    else:
-        return render_template('register.html')
+        check = User.select().where(User.username == request.form['username']).get_or_none()
+        if not check:
+            user = User.create(username=request.form['username'], password=request.form['password'])
+            user.save()
+            return redirect(url_for('login'))
+        else:
+            warning = f"User {request.form['username']} already exists."
+
+    return render_template('register.html', warning=warning)
+
+
+if __name__ == '__main__':
+    app.run()
 
 
